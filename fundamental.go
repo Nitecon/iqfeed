@@ -1,7 +1,7 @@
 package iqfeed
 
 import (
-	"fmt"
+	"strings"
 	"time"
 )
 
@@ -28,7 +28,7 @@ type FundamentalMsg struct {
 	CurrentYrEPS       float64   // The portion of a company's profit allocated to each outstanding share of common stock.
 	NextYrEPS          float64   // The total amount of earnings per share a company is estimated to accumulate over the next four quarters of the current fiscal year.
 	FiveYrGrowthPct    float64   // Earnings Per Share growth rate over a five year period.
-	FiscalYrEnd        float64   // The two digit month that the fiscal year ends for a company.
+	FiscalYrEnd        int       // The two digit month that the fiscal year ends for a company.
 	Reserved5          string    // Reserved field.
 	CompanyName        string    // Company name or contract description
 	RootOptionSymbol   []string  // A list of root option symbols, there may be more than one.
@@ -56,7 +56,7 @@ type FundamentalMsg struct {
 	CalYearHighDate    time.Time // Date at which the High price for the current calendar year occurred. (MM/DD/YYYY)
 	CalYearLowDate     time.Time // Date at which the Low price for the current calendar year occurred. (MM/DD/YYYY)
 	YrEndClose         float64   // Price of Year End Close. (Equities Only)
-	MaturityDate       float64   // Date of maturity for a bond.
+	MaturityDate       time.Time // Date of maturity for a bond.
 	CouponRate         float64   // Interest rate for a bond.
 	ExpirationDate     time.Time // IEOptions, Futures, FutureOptions, and SSFutures only
 	StrikePrice        float64   // IEOptions only
@@ -66,5 +66,61 @@ type FundamentalMsg struct {
 
 // UnMarshall sends the data into the usable struct for consumption by the application.
 func (f *FundamentalMsg) UnMarshall(d []byte) {
-	fmt.Printf("Unmarshall: %s", string(d))
+	items := strings.Split(string(d), ",")
+	f.Symbol = items[0]
+	f.ExchaangeID = items[1]
+	f.PE = GetFloatFromStr(items[2])
+	f.AvgVolume = GetIntFromStr(items[3])
+	f.Fifty2WkHigh = GetFloatFromStr(items[4])
+	f.Fifty2WkLow = GetFloatFromStr(items[5])
+	f.CalYearHigh = GetFloatFromStr(items[6])
+	f.CalyearLow = GetFloatFromStr(items[7])
+	f.DivYield = GetFloatFromStr(items[8])
+	f.DivAmt = GetFloatFromStr(items[9])
+	f.DivRate = GetFloatFromStr(items[10])
+	f.PayDate = GetDateMMDDCCYY(items[11])
+	f.ExDivDate = GetDateMMDDCCYY(items[12])
+	f.Reserved1 = items[13]
+	f.Reserved2 = items[14]
+	f.Reserved3 = items[15]
+	f.ShortInterest = GetIntFromStr(items[16])
+	f.Reserved4 = items[17]
+	f.CurrentYrEPS = GetFloatFromStr(items[18])
+	f.NextYrEPS = GetFloatFromStr(items[19])
+	f.FiveYrGrowthPct = GetFloatFromStr(items[20])
+	f.FiscalYrEnd = GetIntFromStr(items[21])
+	f.Reserved5 = items[22]
+	f.CompanyName = items[23]
+	f.RootOptionSymbol = strings.Split(items[24], " ")
+	f.PctHeldByInst = GetFloatFromStr(items[25])
+	f.Beta = GetFloatFromStr(items[26])
+	f.Leaps = items[27]
+	f.CurrentAssets = GetFloatFromStr(items[28])
+	f.CurrentLiabilities = GetFloatFromStr(items[29])
+	f.BalSheetDate = GetDateMMDDCCYY(items[30])
+	f.LongTermDebt = GetFloatFromStr(items[31])
+	f.ComShrOutstanding = GetFloatFromStr(items[32])
+	f.Reserved6 = items[33]
+	f.SplitFactor1 = items[34]
+	f.SplitFactor2 = items[35]
+	f.Reserved7 = items[36]
+	f.Reserved8 = items[37]
+	f.FormatCode = items[38]
+	f.Precision = GetIntFromStr(items[39])
+	f.SIC = GetIntFromStr(items[40])
+	f.HistVolatility = GetFloatFromStr(items[41])
+	f.SecurityType = items[42]
+	f.ListedMarket = items[43]
+	f.Fifty2WkHighDate = GetDateMMDDCCYY(items[44])
+	f.Fifty2WkLowDate = GetDateMMDDCCYY(items[45])
+	f.CalYearHighDate = GetDateMMDDCCYY(items[46])
+	f.CalYearLowDate = GetDateMMDDCCYY(items[47])
+	f.YrEndClose = GetFloatFromStr(items[48])
+	f.MaturityDate = GetDateMMDDCCYY(items[49])
+	f.CouponRate = GetFloatFromStr(items[50])
+	f.ExpirationDate = GetDateMMDDCCYY(items[51])
+	f.StrikePrice = GetFloatFromStr(items[52])
+	f.NAICS = GetIntFromStr(items[53])
+	f.ExchangeRoot = items[54]
+
 }
