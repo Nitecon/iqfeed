@@ -105,14 +105,14 @@ func (c *IQC) processNewsMsg(d []byte) {
 // Process404Msg handles messages indicating that a symbol was not found.
 func (c *IQC) process404Msg(d []byte) {
 	e := &ErrorMsg{}
-	e.UnMarshall(d, 404)
+	e.UnMarshall(true, d, 404)
 	c.Errors <- e
 }
 
 // ProcessErrorMsg handles error messages in the form of error text.
 func (c *IQC) processErrorMsg(d []byte) {
 	e := &ErrorMsg{}
-	e.UnMarshall(d, 500)
+	e.UnMarshall(false, d, 500)
 	c.Errors <- e
 }
 

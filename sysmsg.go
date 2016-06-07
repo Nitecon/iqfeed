@@ -1,6 +1,9 @@
 package iqfeed
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // SystemMessage is the main system message that will be returned and set by the client.
 type SystemMessage struct {
@@ -49,5 +52,5 @@ type SystemStats struct {
 
 // UnMarshall sends the data into the usable struct for consumption by the application.
 func (f *SystemMessage) UnMarshall(d []byte) {
-
+	fmt.Printf("System Message: %s", string(d))
 }
