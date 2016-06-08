@@ -11,7 +11,6 @@ import (
 func (c *IQC) Write(data string) {
 	fmt.Printf("Writing: %s", data)
 	c.Conn.Write([]byte(data))
-	time.Sleep(1 * time.Second)
 }
 
 // WriteBackup does as the name suggests and write the []byte data directly to a file for re-use later.
