@@ -59,16 +59,20 @@ func (c *IQC) processSysMsg(d []byte) {
 // ProcessSumMsg handles summary messages, field definitions are available here: http://www.iqfeed.net/dev/api/docs/Level1UpdateSummaryMessage.cfm.
 func (c *IQC) processSumMsg(d []byte) {
 	s := &UpdSummaryMsg{}
-	s.UnMarshall(d, c.DynFields)
-
+	items := strings.Split(string(d), ",")
+	s.UnMarshall(items, c.DynFields)
 	c.Updates <- s
 }
 
 // ProcessUpdMsg handles update messages, field definitions are available here: http://www.iqfeed.net/dev/api/docs/Level1UpdateSummaryMessage.cfm.
 func (c *IQC) processUpdMsg(d []byte) {
 	u := &UpdSummaryMsg{}
-	u.UnMarshall(d, c.DynFields)
-
+	items := strings.Split(string(d), ",")
+	if items[2] == "Not Found" {
+		c.process404Msg([]byte(items[0]))
+		return
+	}
+	u.UnMarshall(items, c.DynFields)
 	c.Updates <- u
 }
 

@@ -2,6 +2,7 @@ package iqfeed
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strings"
 	"time"
@@ -53,12 +54,18 @@ func (c *IQC) WatchSymbol(symbol string) {
 func (c *IQC) WatchOptionSymbol(symbol string, value float64, contractDate time.Time, isCall bool) {
 	// Final format should be something like: MSFT1220J30.5
 	ydm := contractDate.Format("0602")
+	_, rem := math.Modf(value)
+	pv := fmt.Sprintf("%.0f", value)
+	if rem > 0 {
+		pv = fmt.Sprintf("%.1f", value)
+	}
+
 	if isCall {
 		ydm = ydm + c.getCallChar(contractDate)
 	} else {
 		ydm = ydm + c.getPutChar(contractDate)
 	}
-	tSym := fmt.Sprintf("%s%s%f", symbol, ydm, value)
+	tSym := fmt.Sprintf("%s%s%s", symbol, ydm, pv)
 	c.WatchSymbol(tSym)
 }
 

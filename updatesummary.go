@@ -1,7 +1,7 @@
 package iqfeed
 
 import (
-	"strings"
+	"fmt"
 	"time"
 )
 
@@ -81,10 +81,11 @@ type UpdSummaryMsg struct {
 }
 
 // UnMarshall sends the data into the usable struct for consumption by the application.
-func (u *UpdSummaryMsg) UnMarshall(d []byte, fields map[int]string) {
+func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string) {
 	//DynFields: map[4:Most Recent Trade Market Center 7:Bid Size 11:High 1:Most Recent Trade 8:Ask 9:Ask Size 12:Low 10:Open 15:Most Recent Trade Conditions 13:Close 14:Message Contents 0:Symbol 2:Most Recent Trade Size 3:Most Recent Trade TimeMS 5:Total Volume 6:Bid]
 	//Unmarshall: AAPL,95.0200,100,09:35:57.022,26,1325032,95.0200,100,95.0400,400,95.0000,95.3800,94.8600,94.4800,ba,01,
-	items := strings.Split(string(d), ",")
+
+	fmt.Printf("Unmarshall: %#v\n", items)
 	for k, v := range items {
 		switch fields[k] {
 		case "7 Day Yield":
