@@ -45,7 +45,7 @@ func (c *IQC) processSysMsg(d []byte) {
 
 	pfx := strings.Split(string(d), ",")
 	switch pfx[0] {
-	case "CURRENT UPDATE FIELDNAMES":
+	case "UPDATE FIELDNAMES":
 		/* We use a map here to preserve the actual order as it's important with marshalling dynamic fields */
 		for i := 1; i < len(pfx); i++ {
 			c.DynFields[i-1] = pfx[i]
