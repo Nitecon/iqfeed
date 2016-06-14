@@ -18,26 +18,29 @@ func GetIntFromStr(d string) int {
 }
 
 // GetTimeInHMS parses the time field in iqfeed and returns a time object.
-func GetTimeInHMS(d string) time.Time {
+func GetTimeInHMS(d string, tz string) time.Time {
 	// We care not about errors here as we require a time field, even if it's in the past or we need to invalidate the entire struct, which may be worse overall.
 	// This is unfortunately important as the timefields may not always be set so we at least still return a time object which can be checked for invalid date.
-	t, _ := time.Parse("15:04:05", d)
+	loc, _ := time.LoadLocation(tz)
+	t, _ := time.ParseInLocation("15:04:05", d, loc)
 
 	return t
 }
 
 // GetTimeInHMSmicro parses the time field in iqfeed and returns a time object, this parse includes microsecond accuracy parsing.
-func GetTimeInHMSmicro(d string) time.Time {
+func GetTimeInHMSmicro(d string, tz string) time.Time {
 	// We care not about errors here as we require a time field, even if it's in the past or we need to invalidate the entire struct, which may be worse overall.
 	// This is unfortunately important as the timefields may not always be set so we at least still return a time object which can be checked for invalid date.
-	t, _ := time.Parse("15:04:05.000", d)
+	loc, _ := time.LoadLocation(tz)
+	t, _ := time.ParseInLocation("15:04:05.000", d, loc)
 
 	return t
 }
 
 // GetDateMMDDCCYY returns a time object after parsing the MM/DD/CCYY layout in iqfeed.
-func GetDateMMDDCCYY(d string) time.Time {
-	t, _ := time.Parse("01/02/2006", d)
+func GetDateMMDDCCYY(d string, tz string) time.Time {
+	loc, _ := time.LoadLocation(tz)
+	t, _ := time.ParseInLocation("01/02/2006", d, loc)
 
 	return t
 }

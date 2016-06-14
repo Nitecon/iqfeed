@@ -20,6 +20,7 @@ type IQC struct {
 	Regional     chan *RegionalMsg
 	Time         chan *TimeMsg
 	Updates      chan *UpdSummaryMsg
+	TimeZone     string
 	CreateBackup bool
 	BackupFile   string
 	Conn         net.Conn
@@ -28,6 +29,9 @@ type IQC struct {
 }
 
 func (c *IQC) connect(cs string) {
+	if c.TimeZone == "" {
+		c.TimeZone = "America/New_York"
+	}
 	c.DynFields = make(map[int]string)
 	if cs == "" {
 		cs = "localhost:5009"
@@ -51,7 +55,7 @@ func (c *IQC) processSysMsg(d []byte) {
 			c.DynFields[i-1] = pfx[i]
 		}
 	default:
-		s.UnMarshall(d)
+		s.UnMarshall(d, c.TimeZone)
 		c.System <- s
 	}
 }
@@ -60,7 +64,7 @@ func (c *IQC) processSysMsg(d []byte) {
 func (c *IQC) processSumMsg(d []byte) {
 	s := &UpdSummaryMsg{}
 	items := strings.Split(string(d), ",")
-	s.UnMarshall(items, c.DynFields)
+	s.UnMarshall(items, c.DynFields, c.TimeZone)
 	c.Updates <- s
 }
 
@@ -72,14 +76,14 @@ func (c *IQC) processUpdMsg(d []byte) {
 		c.process404Msg([]byte(items[0]))
 		return
 	}
-	u.UnMarshall(items, c.DynFields)
+	u.UnMarshall(items, c.DynFields, c.TimeZone)
 	c.Updates <- u
 }
 
 // ProcessTimeMsg handles timestamp updates, field definitions are available here: http://www.iqfeed.net/dev/api/docs/TimeMessageFormat.cfm.
 func (c *IQC) processTimeMsg(d []byte) {
 	t := &TimeMsg{}
-	t.UnMarshall(d)
+	t.UnMarshall(d, c.TimeZone)
 
 	c.Time <- t
 }
@@ -87,14 +91,14 @@ func (c *IQC) processTimeMsg(d []byte) {
 // ProcessRegUpdMsg handles regional updates field definitions are available here: http://www.iqfeed.net/dev/api/docs/RegionalMessageFormat.cfm.
 func (c *IQC) processRegUpdMsg(d []byte) {
 	r := &RegionalMsg{}
-	r.UnMarshall(d)
+	r.UnMarshall(d, c.TimeZone)
 	c.Regional <- r
 }
 
 // ProcessFndMsg handles fundamental messages, field descriptions are available here: http://www.iqfeed.net/dev/api/docs/Level1FundamentalMessage.cfm.
 func (c *IQC) processFndMsg(d []byte) {
 	f := &FundamentalMsg{}
-	f.UnMarshall(d)
+	f.UnMarshall(d, c.TimeZone)
 	c.Fundamental <- f
 
 }
@@ -102,7 +106,7 @@ func (c *IQC) processFndMsg(d []byte) {
 // ProcessNewsMsg handles summary messages, field definitions are available here: http://www.iqfeed.net/dev/api/docs/StreamingNewsMessageFormat.cfm.
 func (c *IQC) processNewsMsg(d []byte) {
 	n := &NewsMsg{}
-	n.UnMarshall(d)
+	n.UnMarshall(d, c.TimeZone)
 	c.News <- n
 }
 
