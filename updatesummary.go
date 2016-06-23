@@ -78,7 +78,7 @@ type UpdSummaryMsg struct {
 }
 
 // UnMarshall sends the data into the usable struct for consumption by the application.
-func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, tz string) {
+func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, loc *time.Location) {
 	//DynFields: map[4:Most Recent Trade Market Center 7:Bid Size 11:High 1:Most Recent Trade 8:Ask 9:Ask Size 12:Low 10:Open 15:Most Recent Trade Conditions 13:Close 14:Message Contents 0:Symbol 2:Most Recent Trade Size 3:Most Recent Trade TimeMS 5:Total Volume 6:Bid]
 	//Unmarshall: AAPL,95.0200,100,09:35:57.022,26,1325032,95.0200,100,95.0400,400,95.0000,95.3800,94.8600,94.4800,ba,01,
 
@@ -96,7 +96,7 @@ func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, tz str
 		case "Ask Size":
 			u.AskSize = GetIntFromStr(v)
 		case "Ask Time":
-			u.AskTime = GetTimeInHMS(v, tz)
+			u.AskTime = GetTimeInHMS(v, loc)
 		case "Available Regions":
 			u.AvailRegions = v
 		case "Average Maturity":
@@ -110,7 +110,7 @@ func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, tz str
 		case "Bid Size":
 			u.BidSize = GetIntFromStr(v)
 		case "Bid Time":
-			u.BidTime = GetTimeInHMS(v, tz)
+			u.BidTime = GetTimeInHMS(v, loc)
 		case "Change":
 			u.Change = GetFloatFromStr(v)
 		case "Change From Open":
@@ -132,13 +132,13 @@ func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, tz str
 		case "Extended Trade":
 			u.ExtendedTrd = GetFloatFromStr(v)
 		case "Extended Trade Date":
-			u.ExtendedTrdDate = GetDateMMDDCCYY(v, tz)
+			u.ExtendedTrdDate = GetDateMMDDCCYY(v, loc)
 		case "Extended Trade Market Center":
 			u.ExtendedTrdMktCntr = GetIntFromStr(v)
 		case "Extended Trade Size":
 			u.ExtendedTrdSize = GetIntFromStr(v)
 		case "Extended Trade Time":
-			u.ExtendedTrdTime = GetTimeInHMSmicro(v, tz)
+			u.ExtendedTrdTime = GetTimeInHMSmicro(v, loc)
 		case "Extended Trading Change":
 			u.ExtendedTrdChange = GetFloatFromStr(v)
 		case "Extended Trading Difference":
@@ -152,15 +152,15 @@ func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, tz str
 		case "Last":
 			u.Last = GetFloatFromStr(v)
 		case "Last Date":
-			u.LastDate = GetDateMMDDCCYY(v, tz)
+			u.LastDate = GetDateMMDDCCYY(v, loc)
 		case "Last Market Center":
 			u.LastMktCntr = GetIntFromStr(v)
 		case "Last Size":
 			u.LastSize = GetIntFromStr(v)
 		case "Last Time":
-			u.LastTime = GetTimeInHMSmicro(v, tz)
+			u.LastTime = GetTimeInHMSmicro(v, loc)
 		case "Last Trade Date":
-			u.LastTrdDate = GetDateMMDDCCYY(v, tz)
+			u.LastTrdDate = GetDateMMDDCCYY(v, loc)
 		case "Low":
 			u.Low = GetFloatFromStr(v)
 		case "Market Capitalization":
@@ -174,13 +174,13 @@ func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, tz str
 		case "Most Recent Trade Conditions":
 			u.MostRecntTradeCond = v
 		case "Most Recent Trade Date":
-			u.MostRecntTradeDate = GetDateMMDDCCYY(v, tz)
+			u.MostRecntTradeDate = GetDateMMDDCCYY(v, loc)
 		case "Most Recent Trade Market Center":
 			u.MostRecentTradeMktCntr = GetIntFromStr(v)
 		case "Most Recent Trade Size":
 			u.MostRecentTradeSize = GetIntFromStr(v)
 		case "Most Recent Trade Time":
-			u.MostRecentTradeTime = GetTimeInHMSmicro(v, tz)
+			u.MostRecentTradeTime = GetTimeInHMSmicro(v, loc)
 		case "Net Asset Value":
 			u.NetAssetValue = GetFloatFromStr(v)
 		case "Number of Trades Today":
@@ -208,7 +208,7 @@ func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, tz str
 		case "Settle":
 			u.Settle = GetFloatFromStr(v)
 		case "Settlement Date":
-			u.SettleDate = GetDateMMDDCCYY(v, tz)
+			u.SettleDate = GetDateMMDDCCYY(v, loc)
 		case "Spread":
 			u.Spread = GetFloatFromStr(v)
 		case "Symbol":

@@ -48,7 +48,7 @@ type SystemStats struct {
 }
 
 // UnMarshall sends the data into the usable struct for consumption by the application.
-func (f *SystemMessage) UnMarshall(d []byte, tz string) {
+func (f *SystemMessage) UnMarshall(d []byte, loc *time.Location) {
 	//fmt.Printf("System Message: %s", string(d))
 	return
 }

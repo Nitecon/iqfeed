@@ -15,12 +15,11 @@ type NewsMsg struct {
 }
 
 // UnMarshall sends the data into the usable struct for consumption by the application.
-func (n *NewsMsg) UnMarshall(d []byte, tz string) {
+func (n *NewsMsg) UnMarshall(d []byte, loc *time.Location) {
 	items := strings.Split(string(d), ",")
 	n.DistributorCode = items[0]
 	n.StoryID = GetIntFromStr(items[1])
 	n.SymbolList = strings.Split(items[2], ":")
-	loc, _ := time.LoadLocation(tz)
 	t, _ := time.ParseInLocation("20060102 150405", items[3], loc)
 	n.DateTime = t
 	n.Headline = items[4]
