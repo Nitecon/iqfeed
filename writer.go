@@ -10,7 +10,6 @@ import (
 
 // Write performs a write on the channel data which will be picked up by the writer concurrently and written to iqfeed.
 func (c *IQC) Write(data string) {
-	fmt.Printf("Writing: %s", data)
 	c.Conn.Write([]byte(data))
 }
 
