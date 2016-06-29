@@ -1,6 +1,9 @@
 package iqfeed
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // UpdSummaryMsg is the main struct for both update and summary messages.
 type UpdSummaryMsg struct {
@@ -13,6 +16,7 @@ type UpdSummaryMsg struct {
 	AvailRegions           string    // Dash delimited string of available regions.
 	AvgMaturity            float64   // The average number of days until maturity of a Money Market Fund’s assets.
 	Bid                    float64   // The highest price a market maker or broker is willing to pay for a security.
+	BidTick                string    // Undocumented currently
 	BidChange              float64   // Change in Bid since last offer.
 	BidMktCenter           int       // The Market Center that sent the bid information. See Listed Market Codes for possible values.
 	BidSize                int       // The share size available for the bid price in a given security
@@ -26,7 +30,7 @@ type UpdSummaryMsg struct {
 	DecPrecision           string    // Last Precision used
 	Delay                  int       // The number of minutes a quote is delayed when not authorized for real-time data
 	ExchangeID             string    // This is the exchange ID. Convert to decimal and use the Listed Markets lookup to decode this value.
-	ExtendedTrd            float64   // Price of the most recent extended trade (last qualified trades + Form T trades).
+	ExtendedTrdLast        float64   // Price of the most recent extended trade (last qualified trades + Form T trades).
 	ExtendedTrdDate        time.Time // Date of the extended trade. (MM/DD/CCYY)
 	ExtendedTrdMktCntr     int       // Market Center of the most recent extended trade (last qualified trades + Form T trades).
 	ExtendedTrdSize        int       // Size of the most recent extended trade (last qualified trades + Form T trades).
@@ -53,6 +57,7 @@ type UpdSummaryMsg struct {
 	MostRecentTradeSize    int       // Size of the most recent trade (including all non-last-qualified trades).
 	MostRecentTradeTime    time.Time // Time (including microseconds) of the most recent trade (including all non-last-qualified trades).
 	NetAssetValue          float64   // Mutual Funds only. The market value of a mutual fund share equal to the net asset of a fund divided by the total number of shares outstanding. NOTE: this field is the same as the Bid field for Mutual Funds.
+	NetAssetValue2         float64   // Undocumented
 	NumTradesToday         int       // The number of trades for the current day.
 	Open                   float64   // The opening price of the day. For commodities this will be the first TRADE of the session.
 	OpenInterest           int       // IEOptions, Futures, FutureOptions, and SSFutures only.
@@ -67,6 +72,7 @@ type UpdSummaryMsg struct {
 	Settle                 float64   // Futures or FutureOptions only.
 	SettleDate             time.Time // The date that the Settle is valid for.
 	Spread                 float64   // The difference between Bid and Ask prices
+	Strike                 float64   // The strike price for the option
 	Symbol                 string    // The Symbol ID to match with watch request
 	Tick                   int       // "173"=Up, "175"=Down, "183"=No Change. Only valid for Last qualified trades.
 	TickID                 int       // Identifier for tick
@@ -74,6 +80,12 @@ type UpdSummaryMsg struct {
 	Type                   string    // Valid values are Q or P. The character Q indicates an Update message, and the character P indicates a Summary Message.
 	Volatility             float64   // Real-time calculated volatility (Today's High - Today's Low) / Last
 	VWAP                   float64   // Volume Weighted Average Price.
+	IncrVolume             int       // Incremental Volume
+	Reserved1              string    // Reserved
+	ExpirationDate         time.Time // Expiration date
+	RegionalVol            int       // RegionalVol
+	Regions                string    // Undocumented
+	TradeTime              time.Time // TradeTime
 
 }
 
@@ -81,150 +93,145 @@ type UpdSummaryMsg struct {
 func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, loc *time.Location) {
 	//DynFields: map[4:Most Recent Trade Market Center 7:Bid Size 11:High 1:Most Recent Trade 8:Ask 9:Ask Size 12:Low 10:Open 15:Most Recent Trade Conditions 13:Close 14:Message Contents 0:Symbol 2:Most Recent Trade Size 3:Most Recent Trade TimeMS 5:Total Volume 6:Bid]
 	//Unmarshall: AAPL,95.0200,100,09:35:57.022,26,1325032,95.0200,100,95.0400,400,95.0000,95.3800,94.8600,94.4800,ba,01,
-
+	fmt.Printf("Dyn: %#v\nItems: %#v\n", fields, items)
+	time.Sleep(50 * time.Millisecond)
 	//fmt.Printf("Unmarshall: %#v\n", items)
 	for k, v := range items {
 		switch fields[k] {
-		case "7 Day Yield":
-			u.SevenDayYield = GetFloatFromStr(v)
-		case "Ask":
-			u.Ask = GetFloatFromStr(v)
-		case "Ask Change":
-			u.AskChange = GetFloatFromStr(v)
-		case "Ask Market Center":
-			u.AskMktCenter = GetIntFromStr(v)
-		case "Ask Size":
-			u.AskSize = GetIntFromStr(v)
-		case "Ask Time":
-			u.AskTime = GetTimeInHMS(v, loc)
-		case "Available Regions":
-			u.AvailRegions = v
-		case "Average Maturity":
-			u.AvgMaturity = GetFloatFromStr(v)
-		case "Bid":
-			u.Bid = GetFloatFromStr(v)
-		case "Bid Change":
-			u.BidChange = GetFloatFromStr(v)
-		case "Bid Market Center":
-			u.BidMktCenter = GetIntFromStr(v)
-		case "Bid Size":
-			u.BidSize = GetIntFromStr(v)
-		case "Bid Time":
-			u.BidTime = GetTimeInHMS(v, loc)
-		case "Change":
-			u.Change = GetFloatFromStr(v)
-		case "Change From Open":
-			u.ChangeFrmOpen = GetFloatFromStr(v)
-		case "Close":
-			u.Close = GetFloatFromStr(v)
-		case "Close Range 1":
-			u.CloseRng1 = GetFloatFromStr(v)
-		case "Close Range 2":
-			u.CloseRng2 = GetFloatFromStr(v)
-		case "Days to Expiration":
-			u.DaysToExpir = v
-		case "Decimal Precision":
-			u.DecPrecision = v
-		case "Delay":
-			u.Delay = GetIntFromStr(v)
+		case "Symbol":
+			u.Symbol = v
 		case "Exchange ID":
 			u.ExchangeID = v
-		case "Extended Trade":
-			u.ExtendedTrd = GetFloatFromStr(v)
-		case "Extended Trade Date":
-			u.ExtendedTrdDate = GetDateMMDDCCYY(v, loc)
-		case "Extended Trade Market Center":
-			u.ExtendedTrdMktCntr = GetIntFromStr(v)
-		case "Extended Trade Size":
-			u.ExtendedTrdSize = GetIntFromStr(v)
-		case "Extended Trade Time":
-			u.ExtendedTrdTime = GetTimeInHMSmicro(v, loc)
+		case "Last":
+			u.Last = GetFloatFromStr(v)
+		case "Change":
+			u.Change = GetFloatFromStr(v)
+		case "Percent Change":
+			u.PcntChange = GetFloatFromStr(v)
+		case "Total Volume":
+			u.TotalVol = GetIntFromStr(v)
+		case "Incremental Volume":
+			u.IncrVolume = GetIntFromStr(v)
+		case "High":
+			u.High = GetFloatFromStr(v)
+		case "Low":
+			u.Low = GetFloatFromStr(v)
+		case "Bid":
+			u.Bid = GetFloatFromStr(v)
+		case "Ask":
+			u.Ask = GetFloatFromStr(v)
+		case "Bid Size":
+			u.BidSize = GetIntFromStr(v)
+		case "Ask Size":
+			u.AskSize = GetIntFromStr(v)
+		case "Tick":
+			u.Tick = GetIntFromStr(v)
+		case "Bid Tick":
+			u.BidTick = v
+		case "Range":
+			u.Range = GetFloatFromStr(v)
+		case "Last Trade Time":
+			u.LastTrdDate = GetTimeInHMS(v, loc)
+		case "Open Interest":
+			u.OpenInterest = GetIntFromStr(v)
+		case "Open":
+			u.Open = GetFloatFromStr(v)
+		case "Close":
+			u.Close = GetFloatFromStr(v)
+		case "Spread":
+			u.Spread = GetFloatFromStr(v)
+		case "Strike":
+			u.Strike = GetFloatFromStr(v)
+		case "Settle":
+			u.Settle = GetFloatFromStr(v)
+		case "Delay":
+			u.Delay = GetIntFromStr(v)
+		case "Market Center":
+			u.AskMktCenter = GetIntFromStr(v)
+		case "Restricted Code":
+			u.RestrictedCode = v
+		case "Net Asset Value":
+			u.NetAssetValue = GetFloatFromStr(v)
+		case "Average Maturity":
+			u.AvgMaturity = GetFloatFromStr(v)
+		case "7 Day Yield":
+			u.SevenDayYield = GetFloatFromStr(v)
+		case "Last Trade Date":
+			u.LastTrdDate = GetDateMMDDCCYY(v, loc)
+		case "(Reserved)":
+			u.Reserved1 = v
+		case "Extended Trading Last":
+			u.ExtendedTrdLast = GetFloatFromStr(v)
+		case "Expiration Date":
+			u.ExpirationDate = GetDateMMDDCCYY(v, loc)
+		case "Regional Volume":
+			u.RegionalVol = GetIntFromStr(v)
+		case "Net Asset Value 2":
+			u.NetAssetValue2 = GetFloatFromStr(v)
 		case "Extended Trading Change":
 			u.ExtendedTrdChange = GetFloatFromStr(v)
 		case "Extended Trading Difference":
 			u.ExtendedTrdDiff = GetFloatFromStr(v)
-		case "Financial Status Indicator":
-			u.FinancialStatusInd = v
-		case "Fraction Display Code":
-			u.FractionDispCode = v
-		case "High":
-			u.High = GetFloatFromStr(v)
-		case "Last":
-			u.Last = GetFloatFromStr(v)
-		case "Last Date":
-			u.LastDate = GetDateMMDDCCYY(v, loc)
-		case "Last Market Center":
-			u.LastMktCntr = GetIntFromStr(v)
-		case "Last Size":
-			u.LastSize = GetIntFromStr(v)
-		case "Last Time":
-			u.LastTime = GetTimeInHMSmicro(v, loc)
-		case "Last Trade Date":
-			u.LastTrdDate = GetDateMMDDCCYY(v, loc)
-		case "Low":
-			u.Low = GetFloatFromStr(v)
-		case "Market Capitalization":
-			u.MktCapitilization = GetFloatFromStr(v)
-		case "Market Open":
-			u.MktOpen = GetIntFromStr(v)
-		case "Message Contents":
-			u.MsgContents = v
-		case "Most Recent Trade":
-			u.MostRecentTrade = GetFloatFromStr(v)
-		case "Most Recent Trade Conditions":
-			u.MostRecntTradeCond = v
-		case "Most Recent Trade Date":
-			u.MostRecntTradeDate = GetDateMMDDCCYY(v, loc)
-		case "Most Recent Trade Market Center":
-			u.MostRecentTradeMktCntr = GetIntFromStr(v)
-		case "Most Recent Trade Size":
-			u.MostRecentTradeSize = GetIntFromStr(v)
-		case "Most Recent Trade Time":
-			u.MostRecentTradeTime = GetTimeInHMSmicro(v, loc)
-		case "Net Asset Value":
-			u.NetAssetValue = GetFloatFromStr(v)
-		case "Number of Trades Today":
-			u.NumTradesToday = GetIntFromStr(v)
-		case "Open":
-			u.Open = GetFloatFromStr(v)
-		case "Open Interest":
-			u.OpenInterest = GetIntFromStr(v)
-		case "Open Range 1":
-			u.OpenRange1 = GetFloatFromStr(v)
-		case "Open Range 2":
-			u.OpenRange2 = GetFloatFromStr(v)
-		case "Percent Change":
-			u.PcntChange = GetFloatFromStr(v)
-		case "Percent Off Average Volume":
-			u.PcntOffAvgVol = GetFloatFromStr(v)
-		case "Previous Day Volume":
-			u.PrevDayVol = GetIntFromStr(v)
 		case "Price-Earnings Ratio":
 			u.PERatio = GetFloatFromStr(v)
-		case "Range":
-			u.Range = GetFloatFromStr(v)
-		case "Restricted Code":
-			u.RestrictedCode = v
-		case "Settle":
-			u.Settle = GetFloatFromStr(v)
-		case "Settlement Date":
-			u.SettleDate = GetDateMMDDCCYY(v, loc)
-		case "Spread":
-			u.Spread = GetFloatFromStr(v)
-		case "Symbol":
-			u.Symbol = v
-		case "Tick":
-			u.Tick = GetIntFromStr(v)
-		case "TickID":
-			u.TickID = GetIntFromStr(v)
-		case "Total Volume":
-			u.TotalVol = GetIntFromStr(v)
-		case "Type":
-			u.Type = v
+		case "Percent Off Average Volume":
+			u.PcntOffAvgVol = GetFloatFromStr(v)
+		case "Bid Change":
+			u.BidChange = GetFloatFromStr(v)
+		case "Ask Change":
+			u.AskChange = GetFloatFromStr(v)
+		case "Change From Open":
+			u.ChangeFrmOpen = GetFloatFromStr(v)
+		case "Market Open":
+			u.MktOpen = GetIntFromStr(v)
 		case "Volatility":
 			u.Volatility = GetFloatFromStr(v)
+		case "Market Capitalization":
+			u.MktCapitilization = GetFloatFromStr(v)
+		case "Fraction Display Code":
+			u.FractionDispCode = v
+		case "Decimal Precision":
+			u.DecPrecision = v
+		case "Days to Expiration":
+			u.DaysToExpir = v
+		case "Previous Day Volume":
+			u.PrevDayVol = GetIntFromStr(v)
+		case "Regions":
+			u.Regions = v
+		case "Open Range 1":
+			u.OpenRange1 = GetFloatFromStr(v)
+		case "Close Range 1":
+			u.CloseRng1 = GetFloatFromStr(v)
+		case "Open Range 2":
+			u.OpenRange2 = GetFloatFromStr(v)
+		case "Close Range 2":
+			u.CloseRng2 = GetFloatFromStr(v)
+		case "Number of Trades Today":
+			u.NumTradesToday = GetIntFromStr(v)
+		case "Bid Time":
+			u.BidTime = GetTimeInHMS(v, loc)
+		case "Ask Time":
+			u.AskTime = GetTimeInHMS(v, loc)
 		case "VWAP":
 			u.VWAP = GetFloatFromStr(v)
+		case "TickID":
+			u.TickID = GetIntFromStr(v)
+		case "Financial Status Indicator":
+			u.FinancialStatusInd = v
+		case "Settlement Date":
+			u.SettleDate = GetDateMMDDCCYY(v, loc)
+		case "Trade Market Center":
+			u.MostRecentTradeMktCntr = GetIntFromStr(v)
+		case "Bid Market Center":
+			u.BidMktCenter = GetIntFromStr(v)
+		case "Ask Market Center":
+			u.AskMktCenter = GetIntFromStr(v)
+		case "Trade Time":
+			u.TradeTime = GetTimeInHMS(v, loc)
+		case "Available Regions":
+			u.AvailRegions = v
+		case "Type":
+			u.Type = v
 		}
 	}
 }

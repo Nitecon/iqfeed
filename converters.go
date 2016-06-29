@@ -37,7 +37,7 @@ func GetTimeInHMSmicro(d string, loc *time.Location) time.Time {
 
 // GetDateMMDDCCYY returns a time object after parsing the MM/DD/CCYY layout in iqfeed.
 func GetDateMMDDCCYY(d string, loc *time.Location) time.Time {
-	t, _ := time.ParseInLocation("01/02/2006", d, loc)
+	t, _ := time.ParseInLocation("01/02/06", d, loc)
 
 	return t
 }

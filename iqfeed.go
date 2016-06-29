@@ -61,6 +61,11 @@ func (c *IQC) processSysMsg(d []byte) {
 		for i := 1; i < len(pfx); i++ {
 			c.DynFields[i-1] = pfx[i]
 		}
+	case "CURRENT UPDATE FIELDNAMES":
+		/* We use a map here to preserve the actual order as it's important with marshalling dynamic fields */
+		for i := 1; i < len(pfx); i++ {
+			c.DynFields[i-1] = pfx[i]
+		}
 	default:
 		s.UnMarshall(d, c.TimeLoc)
 		c.System <- s
