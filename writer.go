@@ -50,7 +50,7 @@ func (c *IQC) WatchSymbol(symbol string) {
 }
 
 // WatchOptionSymbol tracks a new symbol based on contract date (for option chains), contractDate indicates the date for the option contract and isCall indicates whether it is a call / put contract.
-func (c *IQC) WatchOptionSymbol(symbol string, value float64, contractDate time.Time, isCall bool) {
+func (c *IQC) WatchOptionSymbol(symbol string, value float64, contractDate time.Time, isCall bool) string {
 	// Final format should be something like: MSFT1220J30.5
 	ydm := contractDate.Format("0602")
 	_, rem := math.Modf(value)
@@ -66,6 +66,7 @@ func (c *IQC) WatchOptionSymbol(symbol string, value float64, contractDate time.
 	}
 	tSym := fmt.Sprintf("%s%s%s", symbol, ydm, pv)
 	c.WatchSymbol(tSym)
+	return tSym
 }
 
 // TradeOnlyWatch Begins a trades only watch on a symbol for Level 1 updates.
