@@ -1,8 +1,6 @@
 package iqfeed
 
-import (
-	"time"
-)
+import "time"
 
 // UpdSummaryMsg is the main struct for both update and summary messages.
 type UpdSummaryMsg struct {
@@ -96,6 +94,7 @@ func (u *UpdSummaryMsg) UnMarshall(items []string, fields map[int]string, loc *t
 	//time.Sleep(50 * time.Millisecond)
 	//fmt.Printf("Unmarshall: %#v\n", items)
 	for k, v := range items {
+
 		switch fields[k] {
 		case "Symbol":
 			u.Symbol = v
