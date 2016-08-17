@@ -145,6 +145,11 @@ func (c *IQC) SelectUpdateFields(fields ...string) {
 	c.Write("S,SELECT UPDATE FIELDS," + strings.Join(fields, ",") + "\r\n")
 }
 
+// RequestListedMarkets will request a list of all the listed markets from the feed.
+func (c *IQC) RequestListedMarkets() {
+	c.Write("SLM\r\n")
+}
+
 // SetLogLevels Change the logging levels for IQFeed. Level Docs: http://www.iqfeed.net/dev/api/docs/IQConnectLogging.cfm.
 func (c *IQC) SetLogLevels(levels ...string) {
 	c.Write("S,SET LOG LEVELS," + strings.Join(levels, ",") + "\r\n")

@@ -267,6 +267,7 @@ func (c *IQC) Start(connectString string) *IQC {
 	c.Updates = make(chan *UpdSummaryMsg)
 	go c.read()
 	c.ReqCurrentUpdateFNames()
+	c.RequestListedMarkets()
 	return c
 
 }
