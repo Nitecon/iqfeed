@@ -138,6 +138,9 @@ func (c *IQC) processErrorMsg(d []byte) {
 
 // ProcessReceiver is one of the main reciever functions that interprets data received by IQFeed and processes it in sub functions.
 func (c *IQC) processReceiver(d []byte) {
+	if d == nil || len(d) <3 {
+		return
+	}
 	data := d[2:]
 	switch d[0] {
 	case 0x53: // Start letter is S, indicating System message (Unicode representation in integer value).
