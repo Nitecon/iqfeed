@@ -161,6 +161,8 @@ func (c *IQC) processReceiver(d []byte) {
 		c.process404Msg(data)
 	case 0x45: // Start letter is E, error message
 		c.processErrorMsg(data)
+	default: // Print unknown message types
+		fmt.Printf("Unknown message type: %#v\n", d[0])		
 	}
 
 }
